@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v0.6 has a CPU backend, backend selection, backend capability queries, CI, CUDA/HIP backend skeletons, and a minimal CPU launch abstraction.
+Experimental. v0.9 has CPU and mock GPU backends, backend selection, backend capability queries, CI, CUDA/HIP backend skeletons, and a minimal CPU launch abstraction.
 
 ## Goals
 
@@ -65,6 +65,8 @@ SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy
 
 `SHAKTI_BACKEND=cuda` and `SHAKTI_BACKEND=hip` are recognized backend names, but
 they currently return `SHAKTI_ERROR_UNAVAILABLE` for runtime operations.
+`SHAKTI_BACKEND=mock_gpu` is available for hardware-free backend dispatch and
+memory testing.
 
 ## Public API
 
@@ -82,11 +84,11 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiGetSelectedBackendInfo`
 - `shaktiGetErrorString`
 
-For v0.6, successful runtime behavior is implemented by the CPU backend. CUDA and
-HIP exist as explicit skeleton backends only. `shaktiLaunchKernel` runs a host
-function synchronously on the CPU backend and is a launch-shape placeholder for
-future GPU work. Backend info APIs report whether each backend supports memory,
-launch, streams, and events.
+For v0.9, successful memory behavior is implemented by the CPU and mock GPU
+backends. CUDA and HIP exist as explicit skeleton backends only.
+`shaktiLaunchKernel` runs a host function synchronously on the CPU backend and is
+a launch-shape placeholder for future GPU work. Backend info APIs report whether
+each backend supports memory, launch, streams, and events.
 
 For a beginner-friendly walkthrough with examples, see `docs/api.md`.
 

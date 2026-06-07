@@ -1,23 +1,8 @@
-#include "common/backend.h"
-
-#include <cstdlib>
-#include <cstring>
+#include "common/host_memory_backend.h"
 
 namespace {
 
-bool isValidMemcpyKind(ShaktiMemcpyKind kind) {
-  switch (kind) {
-    case SHAKTI_MEMCPY_HOST_TO_HOST:
-    case SHAKTI_MEMCPY_HOST_TO_DEVICE:
-    case SHAKTI_MEMCPY_DEVICE_TO_HOST:
-    case SHAKTI_MEMCPY_DEVICE_TO_DEVICE:
-      return true;
-    default:
-      return false;
-  }
-}
-
-class CpuBackend final : public shakti::Backend {
+class CpuBackend final : public shakti::HostMemoryBackend {
  public:
   const char* name() const override {
     return "cpu";
@@ -45,48 +30,6 @@ class CpuBackend final : public shakti::Backend {
 
   const char* statusMessage() const override {
     return "CPU backend is available";
-  }
-
-  ShaktiResult malloc(void** ptr, size_t bytes) override {
-    if (ptr == nullptr) {
-      return SHAKTI_ERROR_INVALID_VALUE;
-    }
-
-    *ptr = nullptr;
-    if (bytes == 0) {
-      return SHAKTI_SUCCESS;
-    }
-
-    void* allocation = std::malloc(bytes);
-    if (allocation == nullptr) {
-      return SHAKTI_ERROR_OUT_OF_MEMORY;
-    }
-
-    *ptr = allocation;
-    return SHAKTI_SUCCESS;
-  }
-
-  ShaktiResult free(void* ptr) override {
-    std::free(ptr);
-    return SHAKTI_SUCCESS;
-  }
-
-  ShaktiResult memcpy(void* dst, const void* src, size_t bytes,
-                      ShaktiMemcpyKind kind) override {
-    if (!isValidMemcpyKind(kind)) {
-      return SHAKTI_ERROR_INVALID_VALUE;
-    }
-
-    if (bytes == 0) {
-      return SHAKTI_SUCCESS;
-    }
-
-    if (dst == nullptr || src == nullptr) {
-      return SHAKTI_ERROR_INVALID_VALUE;
-    }
-
-    std::memcpy(dst, src, bytes);
-    return SHAKTI_SUCCESS;
   }
 
   ShaktiResult launchKernel(ShaktiKernelFn kernel, ShaktiDim3 grid_dim,

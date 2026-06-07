@@ -7,7 +7,7 @@ namespace shakti {
 
 namespace {
 
-constexpr size_t kBackendCount = 3;
+constexpr size_t kBackendCount = 4;
 
 bool isEmpty(const char* value) {
   return value == nullptr || std::strcmp(value, "") == 0;
@@ -15,8 +15,9 @@ bool isEmpty(const char* value) {
 
 Backend* backends[kBackendCount] = {
     &cpuBackend(),
+    &mockBackend(),
     &cudaBackend(),
-    &hipBackend(),
+    &hipBackend()
 };
 
 }  // namespace

@@ -29,6 +29,7 @@ class Backend {
 };
 
 Backend& cpuBackend();
+Backend& mockBackend();
 Backend& cudaBackend();
 Backend& hipBackend();
 

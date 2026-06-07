@@ -53,6 +53,18 @@
 - Cleaner backend selection path
 - Capability-driven tests
 
+## v0.9: Mock GPU Backend
+
+- Hardware-free non-CPU backend
+- Host-memory-backed mock malloc/free/memcpy/sync
+- Mock backend capability tests
+
+## v1.0: CUDA Memory Seed
+
+- Optional CUDA configure path
+- CUDA malloc/free/memcpy/sync
+- Manual CUDA smoke test
+
 ## Later
 
 - Real GPU kernels

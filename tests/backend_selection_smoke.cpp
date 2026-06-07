@@ -30,7 +30,7 @@ int main() {
   bool ok = true;
   ShaktiBackendInfo info = {};
 
-  ok = ok && expect(shaktiGetBackendCount() == 3, "backend count is 3");
+  ok = ok && expect(shaktiGetBackendCount() == 4, "backend count is 4");
   ok = ok && expect(shaktiGetBackendInfo(0, &info) == SHAKTI_SUCCESS,
                     "CPU backend info is available");
   ok = ok && expect(std::strcmp(info.name, "cpu") == 0, "backend 0 is CPU");
@@ -42,22 +42,32 @@ int main() {
   ok = ok && expect(info.status_message != nullptr, "CPU backend has status message");
 
   ok = ok && expect(shaktiGetBackendInfo(1, &info) == SHAKTI_SUCCESS,
+                    "mock GPU backend info is available");
+  ok = ok && expect(std::strcmp(info.name, "mock_gpu") == 0, "backend 1 is mock GPU");
+  ok = ok && expect(info.available == 1, "mock GPU backend info reports available");
+  ok = ok && expect(info.supports_memory == 1, "mock GPU backend supports memory");
+  ok = ok && expect(info.supports_launch == 0, "mock GPU backend does not support launch");
+  ok = ok && expect(info.supports_streams == 0, "mock GPU backend does not support streams");
+  ok = ok && expect(info.supports_events == 0, "mock GPU backend does not support events");
+  ok = ok && expect(info.status_message != nullptr, "mock GPU backend has status message");
+
+  ok = ok && expect(shaktiGetBackendInfo(2, &info) == SHAKTI_SUCCESS,
                     "CUDA backend info is available");
-  ok = ok && expect(std::strcmp(info.name, "cuda") == 0, "backend 1 is CUDA");
+  ok = ok && expect(std::strcmp(info.name, "cuda") == 0, "backend 2 is CUDA");
   ok = ok && expect(info.available == 0, "CUDA backend info reports unavailable");
   ok = ok && expect(info.supports_memory == 0, "CUDA skeleton does not support memory");
   ok = ok && expect(info.supports_launch == 0, "CUDA skeleton does not support launch");
   ok = ok && expect(info.status_message != nullptr, "CUDA backend has status message");
 
-  ok = ok && expect(shaktiGetBackendInfo(2, &info) == SHAKTI_SUCCESS,
+  ok = ok && expect(shaktiGetBackendInfo(3, &info) == SHAKTI_SUCCESS,
                     "HIP backend info is available");
-  ok = ok && expect(std::strcmp(info.name, "hip") == 0, "backend 2 is HIP");
+  ok = ok && expect(std::strcmp(info.name, "hip") == 0, "backend 3 is HIP");
   ok = ok && expect(info.available == 0, "HIP backend info reports unavailable");
   ok = ok && expect(info.supports_memory == 0, "HIP skeleton does not support memory");
   ok = ok && expect(info.supports_launch == 0, "HIP skeleton does not support launch");
   ok = ok && expect(info.status_message != nullptr, "HIP backend has status message");
 
-  ok = ok && expect(shaktiGetBackendInfo(3, &info) == SHAKTI_ERROR_INVALID_VALUE,
+  ok = ok && expect(shaktiGetBackendInfo(4, &info) == SHAKTI_ERROR_INVALID_VALUE,
                     "invalid backend index is rejected");
   ok = ok && expect(shaktiGetBackendInfo(0, nullptr) == SHAKTI_ERROR_INVALID_VALUE,
                     "null backend info output is rejected");
@@ -77,12 +87,44 @@ int main() {
                     "SHAKTI_BACKEND=cpu reports CPU backend");
 
   ok = ok && expect(shaktiIsBackendAvailable("cpu") == 1, "CPU backend is available");
+  ok = ok && expect(shaktiIsBackendAvailable("mock_gpu") == 1,
+                    "mock GPU backend is available");
   ok = ok && expect(shaktiIsBackendAvailable("cuda") == 0,
                     "CUDA backend skeleton is unavailable by default");
   ok = ok && expect(shaktiIsBackendAvailable("hip") == 0,
                     "HIP backend skeleton is unavailable by default");
   ok = ok && expect(shaktiIsBackendAvailable("bogus") == 0,
                     "unknown backend is unavailable");
+
+  setenv("SHAKTI_BACKEND", "mock_gpu", 1);
+  int source[4] = {1, 2, 3, 4};
+  int destination[4] = {0, 0, 0, 0};
+  void* mock_ptr = nullptr;
+  ok = ok && expect(std::strcmp(shaktiGetBackendName(), "mock_gpu") == 0,
+                    "SHAKTI_BACKEND=mock_gpu reports mock GPU backend");
+  ok = ok && expect(shaktiGetSelectedBackendInfo(&info) == SHAKTI_SUCCESS,
+                    "selected mock GPU backend info is available");
+  ok = ok && expect(std::strcmp(info.name, "mock_gpu") == 0,
+                    "selected backend info reports mock GPU");
+  ok = ok && expect(shaktiMalloc(&mock_ptr, sizeof(source)) == SHAKTI_SUCCESS,
+                    "mock GPU backend allocates memory");
+  ok = ok && expect(shaktiMemcpy(mock_ptr, source, sizeof(source),
+                                 SHAKTI_MEMCPY_HOST_TO_DEVICE) == SHAKTI_SUCCESS,
+                    "mock GPU backend copies host to device");
+  ok = ok && expect(shaktiMemcpy(destination, mock_ptr, sizeof(destination),
+                                 SHAKTI_MEMCPY_DEVICE_TO_HOST) == SHAKTI_SUCCESS,
+                    "mock GPU backend copies device to host");
+  ok = ok && expect(std::memcmp(source, destination, sizeof(source)) == 0,
+                    "mock GPU backend round-trips bytes");
+  ok = ok && expect(shaktiDeviceSynchronize() == SHAKTI_SUCCESS,
+                    "mock GPU backend synchronizes");
+  ShaktiDim3 grid = {1, 1, 1};
+  ShaktiDim3 block = {1, 1, 1};
+  ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
+                        SHAKTI_ERROR_UNAVAILABLE,
+                    "mock GPU backend launch is unavailable");
+  ok = ok && expect(shaktiFree(mock_ptr) == SHAKTI_SUCCESS,
+                    "mock GPU backend frees memory");
 
   setenv("SHAKTI_BACKEND", "cuda", 1);
   void* ptr = reinterpret_cast<void*>(0x1);
@@ -94,8 +136,6 @@ int main() {
                     "selected backend info reports CUDA");
   ok = ok && expect(shaktiMalloc(&ptr, 16) == SHAKTI_ERROR_UNAVAILABLE,
                     "CUDA skeleton returns unavailable");
-  ShaktiDim3 grid = {1, 1, 1};
-  ShaktiDim3 block = {1, 1, 1};
   ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
                         SHAKTI_ERROR_UNAVAILABLE,
                     "CUDA skeleton launch returns unavailable");

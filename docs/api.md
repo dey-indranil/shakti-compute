@@ -93,7 +93,7 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v0.6, the CPU backend treats all valid memcpy kinds as checked byte copies. This keeps examples backend-shaped even though real device memory does not exist yet.
+In v0.9, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. This keeps examples backend-shaped even though real device memory does not exist yet.
 
 ## Backend Selection
 
@@ -102,6 +102,7 @@ Shakti selects the backend from the `SHAKTI_BACKEND` environment variable.
 ```sh
 ./build/examples/saxpy/saxpy
 SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy
+SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke
 SHAKTI_BACKEND=cuda ./build/examples/saxpy/saxpy
 SHAKTI_BACKEND=hip ./build/examples/saxpy/saxpy
 ```
@@ -110,6 +111,7 @@ Current behavior:
 
 - unset: selects `cpu`
 - `cpu`: selects CPU
+- `mock_gpu`: selects a hardware-free backend for dispatch and memory tests
 - `cuda`: selects CUDA skeleton, currently unavailable
 - `hip`: selects HIP skeleton, currently unavailable
 - anything else: unknown backend
@@ -165,9 +167,10 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v0.6:
+In v0.9:
 
 - CPU is available and supports memory and launch.
+- Mock GPU is available and supports memory, but not launch.
 - CUDA is known but unavailable.
 - HIP is known but unavailable.
 - No backend supports streams or events yet.
@@ -308,6 +311,16 @@ if (result == SHAKTI_ERROR_UNAVAILABLE) {
 ```
 
 This is what happens today with `SHAKTI_BACKEND=cuda` or `SHAKTI_BACKEND=hip`.
+
+### 6. Test Non-CPU Dispatch Without Hardware
+
+```sh
+SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke
+```
+
+The mock GPU backend uses host memory internally, but it is selected through the
+same backend registry as real backends. This lets the project test memory
+dispatch through a non-CPU backend before CUDA or HIP hardware is available.
 
 ## What Shakti Does Not Do Yet
 

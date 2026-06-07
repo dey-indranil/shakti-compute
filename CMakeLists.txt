@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
   ShaktiCompute
-  VERSION 0.6.0
+  VERSION 0.9.0
   DESCRIPTION "Experimental vendor-neutral accelerated computing runtime"
   LANGUAGES CXX
 )
@@ -18,10 +18,12 @@ enable_testing()
 
 add_library(shakti_runtime
   runtime/common/backend_registry.cpp
+  runtime/common/host_memory_backend.cpp
   runtime/common/runtime_common.cpp
   runtime/cpu/runtime_cpu.cpp
   runtime/cuda/runtime_cuda.cpp
   runtime/hip/runtime_hip.cpp
+  runtime/mock/runtime_mock.cpp
 )
 
 target_include_directories(shakti_runtime

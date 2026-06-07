@@ -307,3 +307,37 @@ Deferred:
 Recommended next milestone:
 
 - v0.9 should start the CUDA memory seed behind `SHAKTI_ENABLE_CUDA`, while keeping CPU and CI behavior unchanged on machines without CUDA.
+
+## v0.9: Mock GPU Backend
+
+Status: implemented locally
+
+Achieved:
+
+- Added a reusable private `HostMemoryBackend` base for host-memory-backed backends.
+- Refactored CPU memory operations through `HostMemoryBackend`.
+- Added a `mock_gpu` backend.
+- Registered `mock_gpu` as a known backend after CPU and before CUDA/HIP.
+- Implemented mock GPU malloc/free/memcpy/sync with host memory.
+- Kept mock GPU launch unavailable.
+- Added smoke tests proving a non-CPU backend can allocate, copy, synchronize, report capabilities, and reject launch without GPU hardware.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- Real CUDA memory operations.
+- Real HIP memory operations.
+- Mock GPU launch support.
+- Dynamic backend registration.
+
+Recommended next milestone:
+
+- v1.0 should start the CUDA memory seed behind `SHAKTI_ENABLE_CUDA`, while keeping CPU, mock GPU, and CI behavior unchanged on machines without CUDA.
