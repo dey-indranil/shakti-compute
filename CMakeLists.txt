@@ -1,0 +1,27 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(
+  ShaktiCompute
+  VERSION 0.1.0
+  DESCRIPTION "Experimental vendor-neutral accelerated computing runtime"
+  LANGUAGES CXX
+)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+add_library(shakti_runtime
+  runtime/common/runtime_common.cpp
+  runtime/cpu/runtime_cpu.cpp
+)
+
+target_include_directories(shakti_runtime
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/runtime
+)
+
+add_subdirectory(examples/saxpy)
+add_subdirectory(tests)

@@ -1,0 +1,31 @@
+# Build outputs
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+
+# Binaries and libraries
+*.a
+*.dylib
+*.so
+*.dll
+*.exe
+*.o
+*.obj
+
+# Test and benchmark artifacts
+Testing/
+*.log
+
+# Local editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local environment files
+.env
+.env.*
