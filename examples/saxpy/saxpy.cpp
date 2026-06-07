@@ -6,9 +6,21 @@
 
 namespace {
 
-void saxpyCpu(float* y, const float* x, float a, int n) {
-  for (int i = 0; i < n; ++i) {
-    y[i] = a * x[i] + y[i];
+struct SaxpyArgs {
+  float* y;
+  const float* x;
+  float a;
+  int n;
+};
+
+void saxpyKernel(void* raw_args, const ShaktiLaunchContext* context) {
+  SaxpyArgs* args = static_cast<SaxpyArgs*>(raw_args);
+  const unsigned int threads_per_grid =
+      context->grid_dim.x * context->block_dim.x;
+
+  for (unsigned int i = 0; i < threads_per_grid && i < static_cast<unsigned int>(args->n);
+       ++i) {
+    args->y[i] = args->a * args->x[i] + args->y[i];
   }
 }
 
@@ -59,7 +71,11 @@ int main() {
                    "shaktiMemcpy(y)");
 
   if (ok) {
-    saxpyCpu(device_y, device_x, a, n);
+    SaxpyArgs args = {device_y, device_x, a, n};
+    ShaktiDim3 grid = {static_cast<unsigned int>((n + 255) / 256), 1, 1};
+    ShaktiDim3 block = {256, 1, 1};
+    ok = ok && check(shaktiLaunchKernel(saxpyKernel, grid, block, &args, 0),
+                     "shaktiLaunchKernel");
     ok = ok && check(shaktiDeviceSynchronize(), "shaktiDeviceSynchronize");
     ok = ok && check(shaktiMemcpy(result_y.data(), device_y, n * sizeof(float),
                                   SHAKTI_MEMCPY_DEVICE_TO_HOST),

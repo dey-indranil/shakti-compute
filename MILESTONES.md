@@ -156,3 +156,40 @@ Deferred:
 Recommended next milestone:
 
 - v0.5 should add a minimal kernel launch abstraction with a CPU launch path before implementing real GPU launches.
+
+## v0.5: Kernel Launch Abstraction
+
+Status: implemented locally
+
+Achieved:
+
+- Added launch-related public types:
+  - `ShaktiDim3`
+  - `ShaktiLaunchContext`
+  - `ShaktiKernelFn`
+- Added `shaktiLaunchKernel`.
+- Added `launchKernel` to the private backend interface.
+- Implemented CPU launch as a synchronous host function call.
+- Kept CUDA and HIP launch behavior explicit as `SHAKTI_ERROR_UNAVAILABLE`.
+- Updated the SAXPY example to run through `shaktiLaunchKernel`.
+- Added smoke tests for launch success, invalid launch inputs, and unavailable skeleton launches.
+- Updated README, programming model, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- Real GPU launch implementation.
+- Streams and async launch behavior.
+- Kernel argument packing beyond a raw `void*`.
+- Backend capability metadata.
+
+Recommended next milestone:
+
+- v0.6 should refine backend/capability queries and diagnostics before adding real CUDA or HIP runtime calls.

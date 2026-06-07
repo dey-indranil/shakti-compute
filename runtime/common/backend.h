@@ -17,6 +17,9 @@ class Backend {
   virtual ShaktiResult free(void* ptr) = 0;
   virtual ShaktiResult memcpy(void* dst, const void* src, size_t bytes,
                               ShaktiMemcpyKind kind) = 0;
+  virtual ShaktiResult launchKernel(ShaktiKernelFn kernel, ShaktiDim3 grid_dim,
+                                    ShaktiDim3 block_dim, void* args,
+                                    size_t shared_memory_bytes) = 0;
   virtual ShaktiResult deviceSynchronize() = 0;
 };
 

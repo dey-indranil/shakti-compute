@@ -22,6 +22,8 @@ bool allocationWorks() {
   return result == SHAKTI_SUCCESS && ptr != nullptr;
 }
 
+void emptyKernel(void* /*args*/, const ShaktiLaunchContext* /*context*/) {}
+
 }  // namespace
 
 int main() {
@@ -51,6 +53,11 @@ int main() {
                     "SHAKTI_BACKEND=cuda reports CUDA backend");
   ok = ok && expect(shaktiMalloc(&ptr, 16) == SHAKTI_ERROR_UNAVAILABLE,
                     "CUDA skeleton returns unavailable");
+  ShaktiDim3 grid = {1, 1, 1};
+  ShaktiDim3 block = {1, 1, 1};
+  ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
+                        SHAKTI_ERROR_UNAVAILABLE,
+                    "CUDA skeleton launch returns unavailable");
   ok = ok && expect(ptr == nullptr, "CUDA skeleton clears allocation output");
 
   setenv("SHAKTI_BACKEND", "hip", 1);
@@ -59,6 +66,9 @@ int main() {
                     "SHAKTI_BACKEND=hip reports HIP backend");
   ok = ok && expect(shaktiMalloc(&ptr, 16) == SHAKTI_ERROR_UNAVAILABLE,
                     "HIP skeleton returns unavailable");
+  ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
+                        SHAKTI_ERROR_UNAVAILABLE,
+                    "HIP skeleton launch returns unavailable");
   ok = ok && expect(ptr == nullptr, "HIP skeleton clears allocation output");
 
   setenv("SHAKTI_BACKEND", "bogus", 1);

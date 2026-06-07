@@ -77,6 +77,18 @@ ShaktiResult shaktiMemcpy(void* dst, const void* src, size_t bytes, ShaktiMemcpy
   return backend->memcpy(dst, src, bytes, kind);
 }
 
+ShaktiResult shaktiLaunchKernel(ShaktiKernelFn kernel, ShaktiDim3 grid_dim,
+                                ShaktiDim3 block_dim, void* args,
+                                size_t shared_memory_bytes) {
+  shakti::Backend* backend = selectedBackend();
+  ShaktiResult backend_status = ensureUsableBackend(backend);
+  if (backend_status != SHAKTI_SUCCESS) {
+    return backend_status;
+  }
+
+  return backend->launchKernel(kernel, grid_dim, block_dim, args, shared_memory_bytes);
+}
+
 ShaktiResult shaktiDeviceSynchronize(void) {
   shakti::Backend* backend = selectedBackend();
   ShaktiResult backend_status = ensureUsableBackend(backend);

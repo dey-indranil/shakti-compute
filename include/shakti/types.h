@@ -20,6 +20,20 @@ typedef enum ShaktiMemcpyKind {
   SHAKTI_MEMCPY_DEVICE_TO_DEVICE = 3
 } ShaktiMemcpyKind;
 
+typedef struct ShaktiDim3 {
+  unsigned int x;
+  unsigned int y;
+  unsigned int z;
+} ShaktiDim3;
+
+typedef struct ShaktiLaunchContext {
+  ShaktiDim3 grid_dim;
+  ShaktiDim3 block_dim;
+  size_t shared_memory_bytes;
+} ShaktiLaunchContext;
+
+typedef void (*ShaktiKernelFn)(void* args, const ShaktiLaunchContext* context);
+
 #ifdef __cplusplus
 }
 #endif

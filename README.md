@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v0.4 has a CPU backend, backend selection, CI, and CUDA/HIP backend skeletons that report unavailable by default.
+Experimental. v0.5 has a CPU backend, backend selection, CI, CUDA/HIP backend skeletons, and a minimal CPU launch abstraction.
 
 ## Goals
 
@@ -23,6 +23,7 @@ Experimental. v0.4 has a CPU backend, backend selection, CI, and CUDA/HIP backen
 - Production GPU performance
 - Supporting every CUDA API
 - Shipping a compiler or kernel language
+- Launching real GPU kernels
 
 ## Build
 
@@ -72,13 +73,16 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiMalloc`
 - `shaktiFree`
 - `shaktiMemcpy`
+- `shaktiLaunchKernel`
 - `shaktiDeviceSynchronize`
 - `shaktiGetBackendName`
 - `shaktiIsBackendAvailable`
 - `shaktiGetErrorString`
 
-For v0.4, successful runtime behavior is implemented by the CPU backend. CUDA and
-HIP exist as explicit skeleton backends only.
+For v0.5, successful runtime behavior is implemented by the CPU backend. CUDA and
+HIP exist as explicit skeleton backends only. `shaktiLaunchKernel` runs a host
+function synchronously on the CPU backend and is a launch-shape placeholder for
+future GPU work.
 
 ## CI
 

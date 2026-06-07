@@ -35,6 +35,12 @@
 - Minimal launch API
 - CPU launch path for debug and tests
 
+## v0.6: Backend Query Refinement
+
+- Backend capability flags
+- More detailed unavailable diagnostics
+- Public backend list API
+
 ## Later
 
 - Real GPU kernels

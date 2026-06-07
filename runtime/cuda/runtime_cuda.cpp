@@ -28,6 +28,12 @@ class CudaBackend final : public shakti::Backend {
     return SHAKTI_ERROR_UNAVAILABLE;
   }
 
+  ShaktiResult launchKernel(ShaktiKernelFn /*kernel*/, ShaktiDim3 /*grid_dim*/,
+                            ShaktiDim3 /*block_dim*/, void* /*args*/,
+                            size_t /*shared_memory_bytes*/) override {
+    return SHAKTI_ERROR_UNAVAILABLE;
+  }
+
   ShaktiResult deviceSynchronize() override {
     return SHAKTI_ERROR_UNAVAILABLE;
   }
