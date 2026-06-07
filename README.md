@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v0.1 starts with a CPU backend and a minimal runtime API.
+Experimental. v0.4 has a CPU backend, backend selection, CI, and CUDA/HIP backend skeletons that report unavailable by default.
 
 ## Goals
 
@@ -16,7 +16,7 @@ Experimental. v0.1 starts with a CPU backend and a minimal runtime API.
 - Future support for CUDA, HIP, Level Zero, and SPIR-V
 - Future MLIR-based compiler pipeline
 
-## Non-Goals For v0.1
+## Non-Goals For v0.x
 
 - Full CUDA compatibility
 - Replacing cuDNN or cuBLAS
@@ -29,6 +29,14 @@ Experimental. v0.1 starts with a CPU backend and a minimal runtime API.
 ```sh
 cmake -S . -B build
 cmake --build build
+```
+
+CUDA and HIP backend skeletons are unavailable stubs. Future real backend work can
+use these reserved CMake flags:
+
+```sh
+cmake -S . -B build -DSHAKTI_ENABLE_CUDA=ON
+cmake -S . -B build -DSHAKTI_ENABLE_HIP=ON
 ```
 
 ## Test
@@ -54,6 +62,9 @@ explicitly:
 SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy
 ```
 
+`SHAKTI_BACKEND=cuda` and `SHAKTI_BACKEND=hip` are recognized backend names, but
+they currently return `SHAKTI_ERROR_UNAVAILABLE` for runtime operations.
+
 ## Public API
 
 The initial C API lives in `include/shakti/runtime.h` and provides:
@@ -62,9 +73,12 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiFree`
 - `shaktiMemcpy`
 - `shaktiDeviceSynchronize`
+- `shaktiGetBackendName`
+- `shaktiIsBackendAvailable`
 - `shaktiGetErrorString`
 
-For v0.1, all runtime behavior is implemented by the CPU backend.
+For v0.4, successful runtime behavior is implemented by the CPU backend. CUDA and
+HIP exist as explicit skeleton backends only.
 
 ## CI
 

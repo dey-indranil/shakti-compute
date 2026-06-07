@@ -15,8 +15,6 @@
 - `SHAKTI_BACKEND=cpu` selection
 - CPU backend registration
 
-## v0.3: Kernel Launch Abstraction
-
 ## v0.3: CI Baseline
 
 - GitHub Actions workflow
@@ -24,7 +22,15 @@
 - CTest registration for smoke tests
 - SAXPY example checks in CI
 
-## v0.4: Kernel Launch Abstraction
+## v0.4: Backend Skeletons
+
+- Public backend query APIs
+- CUDA backend skeleton
+- HIP backend skeleton
+- CMake backend flags
+- Unavailable-backend behavior tests
+
+## v0.5: Kernel Launch Abstraction
 
 - Minimal launch API
 - CPU launch path for debug and tests

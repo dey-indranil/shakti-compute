@@ -13,6 +13,8 @@ ShaktiResult shaktiMalloc(void** ptr, size_t bytes);
 ShaktiResult shaktiFree(void* ptr);
 ShaktiResult shaktiMemcpy(void* dst, const void* src, size_t bytes, ShaktiMemcpyKind kind);
 ShaktiResult shaktiDeviceSynchronize(void);
+const char* shaktiGetBackendName(void);
+int shaktiIsBackendAvailable(const char* name);
 const char* shaktiGetErrorString(ShaktiResult result);
 
 #ifdef __cplusplus

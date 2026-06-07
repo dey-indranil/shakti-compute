@@ -69,6 +69,8 @@ int main() {
                     "invalid value error string is non-null");
   ok = ok && expect(shaktiGetErrorString(SHAKTI_ERROR_OUT_OF_MEMORY) != nullptr,
                     "out of memory error string is non-null");
+  ok = ok && expect(shaktiGetErrorString(SHAKTI_ERROR_UNAVAILABLE) != nullptr,
+                    "unavailable error string is non-null");
   ok = ok && expect(shaktiGetErrorString(SHAKTI_ERROR_UNKNOWN) != nullptr,
                     "unknown error string is non-null");
   ok = ok && expect(shaktiGetErrorString(static_cast<ShaktiResult>(-1)) != nullptr,

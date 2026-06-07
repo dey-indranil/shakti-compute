@@ -114,3 +114,45 @@ Deferred:
 Recommended next milestone:
 
 - v0.4 should add CUDA and HIP backend skeletons behind the existing backend interface, without changing the public runtime API.
+
+## v0.4: Backend Skeletons
+
+Status: implemented locally
+
+Achieved:
+
+- Added `SHAKTI_ERROR_UNAVAILABLE`.
+- Added public backend query APIs:
+  - `shaktiGetBackendName`
+  - `shaktiIsBackendAvailable`
+- Added CUDA and HIP backend skeletons behind the private backend interface.
+- Added `SHAKTI_ENABLE_CUDA` and `SHAKTI_ENABLE_HIP` CMake flags.
+- Extended backend selection:
+  - unset selects CPU
+  - `SHAKTI_BACKEND=cpu` selects CPU
+  - `SHAKTI_BACKEND=cuda` selects the CUDA skeleton
+  - `SHAKTI_BACKEND=hip` selects the HIP skeleton
+  - unknown names return `SHAKTI_ERROR_INVALID_VALUE`
+- Kept CPU as the only backend with successful runtime operations.
+- Extended smoke tests for backend names, availability, and unavailable skeleton behavior.
+- Updated README, programming model, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- Real CUDA runtime calls.
+- Real HIP runtime calls.
+- Backend-specific allocator metadata.
+- Kernel launch abstraction.
+- Streams, events, and async copies.
+
+Recommended next milestone:
+
+- v0.5 should add a minimal kernel launch abstraction with a CPU launch path before implementing real GPU launches.
