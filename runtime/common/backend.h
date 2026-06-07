@@ -13,6 +13,11 @@ class Backend {
 
   virtual const char* name() const = 0;
   virtual bool isAvailable() const = 0;
+  virtual bool supportsMemory() const = 0;
+  virtual bool supportsLaunch() const = 0;
+  virtual bool supportsStreams() const = 0;
+  virtual bool supportsEvents() const = 0;
+  virtual const char* statusMessage() const = 0;
   virtual ShaktiResult malloc(void** ptr, size_t bytes) = 0;
   virtual ShaktiResult free(void* ptr) = 0;
   virtual ShaktiResult memcpy(void* dst, const void* src, size_t bytes,

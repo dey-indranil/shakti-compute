@@ -7,6 +7,8 @@
 
 namespace {
 
+constexpr size_t kBackendCount = 3;
+
 bool isEmpty(const char* value) {
   return value == nullptr || std::strcmp(value, "") == 0;
 }
@@ -26,6 +28,29 @@ shakti::Backend* selectedBackend() {
   }
 
   return nullptr;
+}
+
+shakti::Backend* backendByIndex(size_t index) {
+  switch (index) {
+    case 0:
+      return &shakti::cpuBackend();
+    case 1:
+      return &shakti::cudaBackend();
+    case 2:
+      return &shakti::hipBackend();
+    default:
+      return nullptr;
+  }
+}
+
+void fillBackendInfo(const shakti::Backend& backend, ShaktiBackendInfo* info) {
+  info->name = backend.name();
+  info->available = backend.isAvailable() ? 1 : 0;
+  info->supports_memory = backend.supportsMemory() ? 1 : 0;
+  info->supports_launch = backend.supportsLaunch() ? 1 : 0;
+  info->supports_streams = backend.supportsStreams() ? 1 : 0;
+  info->supports_events = backend.supportsEvents() ? 1 : 0;
+  info->status_message = backend.statusMessage();
 }
 
 ShaktiResult ensureUsableBackend(shakti::Backend* backend) {
@@ -126,6 +151,38 @@ int shaktiIsBackendAvailable(const char* name) {
   }
 
   return 0;
+}
+
+size_t shaktiGetBackendCount(void) {
+  return kBackendCount;
+}
+
+ShaktiResult shaktiGetBackendInfo(size_t index, ShaktiBackendInfo* info) {
+  if (info == nullptr) {
+    return SHAKTI_ERROR_INVALID_VALUE;
+  }
+
+  shakti::Backend* backend = backendByIndex(index);
+  if (backend == nullptr) {
+    return SHAKTI_ERROR_INVALID_VALUE;
+  }
+
+  fillBackendInfo(*backend, info);
+  return SHAKTI_SUCCESS;
+}
+
+ShaktiResult shaktiGetSelectedBackendInfo(ShaktiBackendInfo* info) {
+  if (info == nullptr) {
+    return SHAKTI_ERROR_INVALID_VALUE;
+  }
+
+  shakti::Backend* backend = selectedBackend();
+  if (backend == nullptr) {
+    return SHAKTI_ERROR_INVALID_VALUE;
+  }
+
+  fillBackendInfo(*backend, info);
+  return SHAKTI_SUCCESS;
 }
 
 const char* shaktiGetErrorString(ShaktiResult result) {

@@ -18,6 +18,9 @@ ShaktiResult shaktiLaunchKernel(ShaktiKernelFn kernel, ShaktiDim3 grid_dim,
 ShaktiResult shaktiDeviceSynchronize(void);
 const char* shaktiGetBackendName(void);
 int shaktiIsBackendAvailable(const char* name);
+size_t shaktiGetBackendCount(void);
+ShaktiResult shaktiGetBackendInfo(size_t index, ShaktiBackendInfo* info);
+ShaktiResult shaktiGetSelectedBackendInfo(ShaktiBackendInfo* info);
 const char* shaktiGetErrorString(ShaktiResult result);
 
 #ifdef __cplusplus

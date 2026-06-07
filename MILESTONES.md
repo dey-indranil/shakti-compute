@@ -193,3 +193,47 @@ Deferred:
 Recommended next milestone:
 
 - v0.6 should refine backend/capability queries and diagnostics before adding real CUDA or HIP runtime calls.
+
+## v0.6: Backend Query Refinement
+
+Status: implemented locally
+
+Achieved:
+
+- Added `ShaktiBackendInfo`.
+- Added public backend introspection APIs:
+  - `shaktiGetBackendCount`
+  - `shaktiGetBackendInfo`
+  - `shaktiGetSelectedBackendInfo`
+- Added backend capability fields:
+  - availability
+  - memory support
+  - launch support
+  - stream support
+  - event support
+  - status message
+- Extended the private backend interface with capability metadata.
+- Reported CPU as available with memory and launch support.
+- Reported CUDA and HIP skeletons as unavailable with no memory, launch, stream, or event support.
+- Added smoke tests for backend count, backend info, selected backend info, invalid indexes, and null output pointers.
+- Updated README, programming model, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- Real CUDA runtime calls.
+- Real HIP runtime calls.
+- Public backend lookup by name.
+- Last-error message API.
+- Streams and events.
+
+Recommended next milestone:
+
+- v0.7 should clean up backend lookup/registry internals before adding real CUDA memory operations.

@@ -34,6 +34,16 @@ typedef struct ShaktiLaunchContext {
 
 typedef void (*ShaktiKernelFn)(void* args, const ShaktiLaunchContext* context);
 
+typedef struct ShaktiBackendInfo {
+  const char* name;
+  int available;
+  int supports_memory;
+  int supports_launch;
+  int supports_streams;
+  int supports_events;
+  const char* status_message;
+} ShaktiBackendInfo;
+
 #ifdef __cplusplus
 }
 #endif

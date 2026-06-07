@@ -27,6 +27,26 @@ class CpuBackend final : public shakti::Backend {
     return true;
   }
 
+  bool supportsMemory() const override {
+    return true;
+  }
+
+  bool supportsLaunch() const override {
+    return true;
+  }
+
+  bool supportsStreams() const override {
+    return false;
+  }
+
+  bool supportsEvents() const override {
+    return false;
+  }
+
+  const char* statusMessage() const override {
+    return "CPU backend is available";
+  }
+
   ShaktiResult malloc(void** ptr, size_t bytes) override {
     if (ptr == nullptr) {
       return SHAKTI_ERROR_INVALID_VALUE;

@@ -12,6 +12,26 @@ class HipBackend final : public shakti::Backend {
     return false;
   }
 
+  bool supportsMemory() const override {
+    return false;
+  }
+
+  bool supportsLaunch() const override {
+    return false;
+  }
+
+  bool supportsStreams() const override {
+    return false;
+  }
+
+  bool supportsEvents() const override {
+    return false;
+  }
+
+  const char* statusMessage() const override {
+    return "HIP backend is a skeleton";
+  }
+
   ShaktiResult malloc(void** ptr, size_t /*bytes*/) override {
     if (ptr != nullptr) {
       *ptr = nullptr;

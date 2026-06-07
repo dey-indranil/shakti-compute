@@ -41,6 +41,12 @@
 - More detailed unavailable diagnostics
 - Public backend list API
 
+## v0.7: Backend Registry Cleanup
+
+- Shared backend lookup helpers
+- Cleaner backend selection path
+- Capability-driven tests
+
 ## Later
 
 - Real GPU kernels
