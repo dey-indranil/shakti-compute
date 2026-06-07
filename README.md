@@ -96,3 +96,7 @@ For a beginner-friendly walkthrough with examples, see `docs/api.md`.
 
 GitHub Actions builds and tests the project on Ubuntu and macOS for every push to
 `main` and every pull request.
+
+## License
+
+Shakti Compute is licensed under the Apache License, Version 2.0. See `LICENSE`.
