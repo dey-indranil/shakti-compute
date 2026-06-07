@@ -41,7 +41,13 @@
 - More detailed unavailable diagnostics
 - Public backend list API
 
-## v0.7: Backend Registry Cleanup
+## v0.7: Public API Documentation
+
+- Beginner-friendly API guide
+- Cookbook examples
+- Current limitations
+
+## v0.8: Backend Registry Cleanup
 
 - Shared backend lookup helpers
 - Cleaner backend selection path

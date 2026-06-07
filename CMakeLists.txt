@@ -17,6 +17,7 @@ option(SHAKTI_ENABLE_HIP "Enable the HIP backend skeleton" OFF)
 enable_testing()
 
 add_library(shakti_runtime
+  runtime/common/backend_registry.cpp
   runtime/common/runtime_common.cpp
   runtime/cpu/runtime_cpu.cpp
   runtime/cuda/runtime_cuda.cpp

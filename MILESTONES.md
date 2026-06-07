@@ -272,3 +272,38 @@ Deferred:
 Recommended next milestone:
 
 - v0.8 should clean up backend lookup/registry internals before adding real CUDA memory operations.
+
+## v0.8: Backend Registry Cleanup
+
+Status: implemented locally
+
+Achieved:
+
+- Added private backend registry helpers:
+  - `backendCount`
+  - `backendAt`
+  - `backendByName`
+  - `selectedBackend`
+- Centralized backend order as CPU, CUDA, HIP.
+- Removed hardcoded backend lookup branches from public runtime dispatch.
+- Preserved the existing public API and behavior.
+- Updated roadmap numbering after the public API documentation milestone.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- Real CUDA memory operations.
+- Real HIP memory operations.
+- Public backend lookup by name.
+- Dynamic backend registration.
+
+Recommended next milestone:
+
+- v0.9 should start the CUDA memory seed behind `SHAKTI_ENABLE_CUDA`, while keeping CPU and CI behavior unchanged on machines without CUDA.
