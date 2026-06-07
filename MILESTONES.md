@@ -82,3 +82,35 @@ Deferred:
 Recommended next milestone:
 
 - v0.3 should add CI before introducing CUDA/HIP skeletons.
+
+## v0.3: CI Baseline
+
+Status: implemented locally
+
+Achieved:
+
+- Added CTest registration for runtime smoke tests.
+- Added a GitHub Actions CI workflow.
+- CI builds on Ubuntu and macOS.
+- CI runs `ctest`, the SAXPY example, and the explicit CPU backend SAXPY path.
+- Updated project version to `0.3.0`.
+- Updated README and roadmap docs for CI.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+
+Deferred:
+
+- CUDA and HIP backend skeleton files.
+- Public backend query APIs.
+- Kernel launch abstraction.
+- Compiler or MLIR work.
+
+Recommended next milestone:
+
+- v0.4 should add CUDA and HIP backend skeletons behind the existing backend interface, without changing the public runtime API.

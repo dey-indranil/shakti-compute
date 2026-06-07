@@ -17,6 +17,15 @@
 
 ## v0.3: Kernel Launch Abstraction
 
+## v0.3: CI Baseline
+
+- GitHub Actions workflow
+- Ubuntu and macOS build matrix
+- CTest registration for smoke tests
+- SAXPY example checks in CI
+
+## v0.4: Kernel Launch Abstraction
+
 - Minimal launch API
 - CPU launch path for debug and tests
 

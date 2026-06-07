@@ -31,7 +31,13 @@ cmake -S . -B build
 cmake --build build
 ```
 
-## Run
+## Test
+
+```sh
+ctest --test-dir build --output-on-failure
+```
+
+## Run Examples
 
 ```sh
 ./build/examples/saxpy/saxpy
@@ -59,3 +65,8 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiGetErrorString`
 
 For v0.1, all runtime behavior is implemented by the CPU backend.
+
+## CI
+
+GitHub Actions builds and tests the project on Ubuntu and macOS for every push to
+`main` and every pull request.
