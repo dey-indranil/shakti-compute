@@ -93,7 +93,7 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v0.9, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. This keeps examples backend-shaped even though real device memory does not exist yet.
+In v1.0, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls. This keeps examples backend-shaped while real CUDA memory support grows.
 
 ## Backend Selection
 
@@ -112,7 +112,7 @@ Current behavior:
 - unset: selects `cpu`
 - `cpu`: selects CPU
 - `mock_gpu`: selects a hardware-free backend for dispatch and memory tests
-- `cuda`: selects CUDA skeleton, currently unavailable
+- `cuda`: selects CUDA; unavailable by default, memory-capable when built with `SHAKTI_ENABLE_CUDA=ON`
 - `hip`: selects HIP skeleton, currently unavailable
 - anything else: unknown backend
 
@@ -167,11 +167,11 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v0.9:
+In v1.0:
 
 - CPU is available and supports memory and launch.
 - Mock GPU is available and supports memory, but not launch.
-- CUDA is known but unavailable.
+- CUDA is known and supports memory only when built with `SHAKTI_ENABLE_CUDA=ON`.
 - HIP is known but unavailable.
 - No backend supports streams or events yet.
 
@@ -321,6 +321,20 @@ SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke
 The mock GPU backend uses host memory internally, but it is selected through the
 same backend registry as real backends. This lets the project test memory
 dispatch through a non-CPU backend before CUDA or HIP hardware is available.
+
+### 7. Test CUDA Memory On A CUDA Machine
+
+```sh
+cmake -S . -B build-cuda -DSHAKTI_ENABLE_CUDA=ON
+cmake --build build-cuda
+SHAKTI_BACKEND=cuda ./build-cuda/tests/cuda_memory_smoke
+```
+
+This optional smoke test allocates CUDA memory, copies host data to the device,
+copies it back, synchronizes, and frees the allocation. It passes without CUDA in
+the default build by confirming that CUDA is known but unavailable. In a
+CUDA-enabled build, the CUDA backend reports available only when a usable CUDA
+device and driver are present.
 
 ## What Shakti Does Not Do Yet
 

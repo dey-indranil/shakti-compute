@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v0.9 has CPU and mock GPU backends, backend selection, backend capability queries, CI, CUDA/HIP backend skeletons, and a minimal CPU launch abstraction.
+Experimental. v1.0 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA memory support, a HIP backend skeleton, and a minimal CPU launch abstraction.
 
 ## Goals
 
@@ -32,13 +32,16 @@ cmake -S . -B build
 cmake --build build
 ```
 
-CUDA and HIP backend skeletons are unavailable stubs. Future real backend work can
-use these reserved CMake flags:
+CUDA memory support is optional and requires the CUDA Toolkit. HIP remains an
+unavailable skeleton. Configure optional backends with:
 
 ```sh
 cmake -S . -B build -DSHAKTI_ENABLE_CUDA=ON
 cmake -S . -B build -DSHAKTI_ENABLE_HIP=ON
 ```
+
+CUDA-enabled builds still require a usable CUDA device and driver before the
+CUDA backend reports itself as available.
 
 ## Test
 
@@ -64,7 +67,9 @@ SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy
 ```
 
 `SHAKTI_BACKEND=cuda` and `SHAKTI_BACKEND=hip` are recognized backend names, but
-they currently return `SHAKTI_ERROR_UNAVAILABLE` for runtime operations.
+CUDA only performs memory operations when Shakti is built with
+`SHAKTI_ENABLE_CUDA=ON`; HIP currently returns `SHAKTI_ERROR_UNAVAILABLE` for
+runtime operations.
 `SHAKTI_BACKEND=mock_gpu` is available for hardware-free backend dispatch and
 memory testing.
 
@@ -84,8 +89,9 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiGetSelectedBackendInfo`
 - `shaktiGetErrorString`
 
-For v0.9, successful memory behavior is implemented by the CPU and mock GPU
-backends. CUDA and HIP exist as explicit skeleton backends only.
+For v1.0, successful memory behavior is implemented by the CPU and mock GPU
+backends, and by CUDA when built with `SHAKTI_ENABLE_CUDA=ON`.
+HIP exists as an explicit skeleton backend only.
 `shaktiLaunchKernel` runs a host function synchronously on the CPU backend and is
 a launch-shape placeholder for future GPU work. Backend info APIs report whether
 each backend supports memory, launch, streams, and events.

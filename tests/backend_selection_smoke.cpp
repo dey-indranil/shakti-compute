@@ -54,8 +54,9 @@ int main() {
   ok = ok && expect(shaktiGetBackendInfo(2, &info) == SHAKTI_SUCCESS,
                     "CUDA backend info is available");
   ok = ok && expect(std::strcmp(info.name, "cuda") == 0, "backend 2 is CUDA");
-  ok = ok && expect(info.available == 0, "CUDA backend info reports unavailable");
-  ok = ok && expect(info.supports_memory == 0, "CUDA skeleton does not support memory");
+  const int cuda_available = info.available;
+  ok = ok && expect(info.supports_memory == cuda_available,
+                    "CUDA memory support matches availability");
   ok = ok && expect(info.supports_launch == 0, "CUDA skeleton does not support launch");
   ok = ok && expect(info.status_message != nullptr, "CUDA backend has status message");
 
@@ -89,8 +90,8 @@ int main() {
   ok = ok && expect(shaktiIsBackendAvailable("cpu") == 1, "CPU backend is available");
   ok = ok && expect(shaktiIsBackendAvailable("mock_gpu") == 1,
                     "mock GPU backend is available");
-  ok = ok && expect(shaktiIsBackendAvailable("cuda") == 0,
-                    "CUDA backend skeleton is unavailable by default");
+  ok = ok && expect(shaktiIsBackendAvailable("cuda") == cuda_available,
+                    "CUDA availability matches backend info");
   ok = ok && expect(shaktiIsBackendAvailable("hip") == 0,
                     "HIP backend skeleton is unavailable by default");
   ok = ok && expect(shaktiIsBackendAvailable("bogus") == 0,
@@ -134,12 +135,20 @@ int main() {
                     "selected CUDA backend info is available");
   ok = ok && expect(std::strcmp(info.name, "cuda") == 0,
                     "selected backend info reports CUDA");
-  ok = ok && expect(shaktiMalloc(&ptr, 16) == SHAKTI_ERROR_UNAVAILABLE,
-                    "CUDA skeleton returns unavailable");
+  ShaktiResult cuda_malloc_result = shaktiMalloc(&ptr, 16);
+  if (cuda_available) {
+    ok = ok && expect(cuda_malloc_result == SHAKTI_SUCCESS,
+                      "CUDA backend allocates memory when available");
+    ok = ok && expect(shaktiFree(ptr) == SHAKTI_SUCCESS,
+                      "CUDA backend frees memory when available");
+  } else {
+    ok = ok && expect(cuda_malloc_result == SHAKTI_ERROR_UNAVAILABLE,
+                      "CUDA skeleton returns unavailable");
+    ok = ok && expect(ptr == nullptr, "CUDA skeleton clears allocation output");
+  }
   ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
                         SHAKTI_ERROR_UNAVAILABLE,
-                    "CUDA skeleton launch returns unavailable");
-  ok = ok && expect(ptr == nullptr, "CUDA skeleton clears allocation output");
+                    "CUDA launch remains unavailable");
 
   setenv("SHAKTI_BACKEND", "hip", 1);
   ptr = reinterpret_cast<void*>(0x1);

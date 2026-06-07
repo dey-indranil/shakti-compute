@@ -341,3 +341,42 @@ Deferred:
 Recommended next milestone:
 
 - v1.0 should start the CUDA memory seed behind `SHAKTI_ENABLE_CUDA`, while keeping CPU, mock GPU, and CI behavior unchanged on machines without CUDA.
+
+## v1.0: CUDA Memory Seed
+
+Status: implemented locally
+
+Achieved:
+
+- Added optional CUDA Toolkit discovery when `SHAKTI_ENABLE_CUDA=ON`.
+- Linked `CUDA::cudart` only for CUDA-enabled builds.
+- Implemented CUDA backend memory operations behind the CUDA flag:
+  - `shaktiMalloc`
+  - `shaktiFree`
+  - `shaktiMemcpy`
+  - `shaktiDeviceSynchronize`
+- Mapped common CUDA runtime errors to `ShaktiResult`.
+- Kept CUDA launch unavailable.
+- Added `cuda_memory_smoke`, which passes in default builds and exercises CUDA memory when CUDA is enabled.
+- Kept default CPU/mock GPU CI behavior hardware-free.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke`
+
+Deferred:
+
+- CUDA kernel launch.
+- CUDA streams and events.
+- CUDA allocator metadata.
+- HIP memory operations.
+
+Recommended next milestone:
+
+- v1.1 should add optional HIP memory support or improve CUDA diagnostics depending on available contributor hardware.

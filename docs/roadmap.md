@@ -65,6 +65,12 @@
 - CUDA malloc/free/memcpy/sync
 - Manual CUDA smoke test
 
+## v1.1: CUDA Diagnostics Or HIP Memory
+
+- Improve CUDA unavailable/error reporting
+- Or add optional HIP malloc/free/memcpy/sync
+- Keep default CI hardware-free
+
 ## Later
 
 - Real GPU kernels

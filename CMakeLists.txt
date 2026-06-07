@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
   ShaktiCompute
-  VERSION 0.9.0
+  VERSION 1.0.0
   DESCRIPTION "Experimental vendor-neutral accelerated computing runtime"
   LANGUAGES CXX
 )
@@ -13,6 +13,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(SHAKTI_ENABLE_CUDA "Enable the CUDA backend skeleton" OFF)
 option(SHAKTI_ENABLE_HIP "Enable the HIP backend skeleton" OFF)
+
+if(SHAKTI_ENABLE_CUDA)
+  find_package(CUDAToolkit REQUIRED)
+endif()
 
 enable_testing()
 
@@ -35,9 +39,16 @@ target_include_directories(shakti_runtime
 
 target_compile_definitions(shakti_runtime
   PRIVATE
-    SHAKTI_ENABLE_CUDA=$<BOOL:${SHAKTI_ENABLE_CUDA}>
+    SHAKTI_HAS_CUDA_RUNTIME=$<BOOL:${SHAKTI_ENABLE_CUDA}>
     SHAKTI_ENABLE_HIP=$<BOOL:${SHAKTI_ENABLE_HIP}>
 )
+
+if(SHAKTI_ENABLE_CUDA)
+  target_link_libraries(shakti_runtime
+    PRIVATE
+      CUDA::cudart
+  )
+endif()
 
 add_subdirectory(examples/saxpy)
 add_subdirectory(tests)
