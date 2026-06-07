@@ -237,3 +237,38 @@ Deferred:
 Recommended next milestone:
 
 - v0.7 should clean up backend lookup/registry internals before adding real CUDA memory operations.
+
+## v0.7: Public API Documentation
+
+Status: implemented locally
+
+Achieved:
+
+- Added `docs/api.md`.
+- Documented what Shakti Compute currently does as a product/runtime.
+- Explained result codes and error handling.
+- Documented memory allocation, free, and copy APIs.
+- Documented backend selection with `SHAKTI_BACKEND`.
+- Documented backend capability APIs.
+- Documented the CPU-backed launch API.
+- Added a mini cookbook with examples for:
+  - allocate/copy/free
+  - listing backends
+  - requiring launch support
+  - running a CPU-backed kernel
+  - handling unavailable CUDA/HIP skeletons
+- Linked the API guide from README.
+
+Verified:
+
+- Documentation-only change.
+
+Deferred:
+
+- Generated API reference.
+- Doxygen or hosted docs.
+- Real CUDA/HIP API examples.
+
+Recommended next milestone:
+
+- v0.8 should clean up backend lookup/registry internals before adding real CUDA memory operations.

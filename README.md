@@ -88,6 +88,8 @@ function synchronously on the CPU backend and is a launch-shape placeholder for
 future GPU work. Backend info APIs report whether each backend supports memory,
 launch, streams, and events.
 
+For a beginner-friendly walkthrough with examples, see `docs/api.md`.
+
 ## CI
 
 GitHub Actions builds and tests the project on Ubuntu and macOS for every push to
