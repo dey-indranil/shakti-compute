@@ -31,6 +31,17 @@ target_link_libraries(allocation_ownership_smoke
 
 add_test(NAME allocation_ownership_smoke COMMAND allocation_ownership_smoke)
 
+add_executable(diagnostics_smoke
+  diagnostics_smoke.cpp
+)
+
+target_link_libraries(diagnostics_smoke
+  PRIVATE
+    shakti_runtime
+)
+
+add_test(NAME diagnostics_smoke COMMAND diagnostics_smoke)
+
 add_executable(cuda_memory_smoke
   cuda_memory_smoke.cpp
 )

@@ -490,3 +490,41 @@ Deferred:
 Recommended next milestone:
 
 - v1.4 should add backend error diagnostics, such as a last-error or detailed diagnostic API, so users can see richer backend-specific failure reasons.
+
+## v1.4: Backend Error Diagnostics
+
+Status: implemented locally
+
+Achieved:
+
+- Added `shaktiGetLastErrorMessage`.
+- Stored a thread-local diagnostic string for the most recent runtime operation.
+- Added detailed messages for:
+  - unknown selected backend
+  - unavailable selected backend with backend status
+  - backend operation failures
+  - invalid backend info calls
+  - allocation ownership mismatches
+- Cleared the last-error detail back to `success` after successful runtime calls.
+- Added `diagnostics_smoke`.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke`
+
+Deferred:
+
+- Structured diagnostic records.
+- Backend-specific numeric/vendor error codes in the public API.
+- Public pointer-owner and allocation-size query APIs.
+- Persistent diagnostic history.
+
+Recommended next milestone:
+
+- v1.5 should track allocation sizes so Shakti can reject obvious out-of-range copy requests and prepare for richer memory debugging tools.

@@ -22,6 +22,7 @@ size_t shaktiGetBackendCount(void);
 ShaktiResult shaktiGetBackendInfo(size_t index, ShaktiBackendInfo* info);
 ShaktiResult shaktiGetSelectedBackendInfo(ShaktiBackendInfo* info);
 const char* shaktiGetErrorString(ShaktiResult result);
+const char* shaktiGetLastErrorMessage(void);
 
 #ifdef __cplusplus
 }

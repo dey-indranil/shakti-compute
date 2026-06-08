@@ -43,6 +43,19 @@ if (result != SHAKTI_SUCCESS) {
 }
 ```
 
+Use `shaktiGetLastErrorMessage` when you need more context about the most recent
+runtime operation on the current thread:
+
+```cpp
+ShaktiResult result = shaktiMalloc(nullptr, 1024);
+if (result != SHAKTI_SUCCESS) {
+  std::cerr << shaktiGetLastErrorMessage() << "\n";
+}
+```
+
+The returned pointer remains valid until the next Shakti runtime operation on the
+same thread. Successful runtime operations set the message to `success`.
+
 Common meanings:
 
 - `SHAKTI_SUCCESS`: the operation succeeded.
@@ -93,7 +106,7 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v1.3, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls, and HIP-enabled builds route copies through HIP Runtime API calls. This keeps examples backend-shaped while real GPU support grows one layer at a time.
+In v1.4, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls, and HIP-enabled builds route copies through HIP Runtime API calls. This keeps examples backend-shaped while real GPU support grows one layer at a time.
 
 Shakti also tracks which backend created each allocation. If a known Shakti
 allocation is copied or freed through a different selected backend,
@@ -173,7 +186,7 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v1.3:
+In v1.4:
 
 - CPU is available and supports memory and launch.
 - Mock GPU is available and supports memory, but not launch.
@@ -355,6 +368,22 @@ shaktiFree(ptr);
 
 This is useful even before real GPU kernel launch exists because it catches
 backend-selection mistakes early.
+
+### 9. Print A Detailed Failure
+
+```cpp
+setenv("SHAKTI_BACKEND", "cuda", 1);
+
+void* ptr = nullptr;
+ShaktiResult result = shaktiMalloc(&ptr, 1024);
+if (result != SHAKTI_SUCCESS) {
+  std::cerr << shaktiGetErrorString(result) << "\n";
+  std::cerr << shaktiGetLastErrorMessage() << "\n";
+}
+```
+
+The first line is the generic category, such as `backend unavailable`. The second
+line explains the selected backend and includes that backend's status message.
 
 The mock GPU backend uses host memory internally, but it is selected through the
 same backend registry as real backends. This lets the project test memory

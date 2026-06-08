@@ -89,6 +89,12 @@
 - Preserve backend-specific failure messages after runtime calls
 - Improve user-facing explanations for unavailable GPU backends
 
+## v1.5: Allocation Metadata
+
+- Track allocation sizes
+- Reject obvious out-of-range copy sizes
+- Prepare metadata for future profiler/debug tooling
+
 ## Later
 
 - Real GPU kernels

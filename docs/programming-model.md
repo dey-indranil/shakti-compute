@@ -1,6 +1,6 @@
 # Programming Model
 
-Shakti Compute v1.3 exposes a small C runtime API inspired by familiar accelerator runtimes.
+Shakti Compute v1.4 exposes a small C runtime API inspired by familiar accelerator runtimes.
 
 The always-available memory backends are CPU and mock GPU. Both use ordinary host memory, and `shaktiMemcpy` performs checked byte copies for every `ShaktiMemcpyKind`. CUDA can also provide real device memory operations when Shakti is configured with `SHAKTI_ENABLE_CUDA=ON` and the CUDA Toolkit is available. HIP can provide real device memory operations when Shakti is configured with `SHAKTI_ENABLE_HIP=ON` and ROCm/HIP is available.
 
@@ -9,6 +9,8 @@ Backend selection is intentionally minimal. If `SHAKTI_BACKEND` is unset or set 
 Applications can call `shaktiGetBackendName` to inspect the selected backend name and `shaktiIsBackendAvailable` to check whether a known backend is usable. For richer introspection, `shaktiGetBackendCount`, `shaktiGetBackendInfo`, and `shaktiGetSelectedBackendInfo` expose backend availability, capability flags, and a status message.
 
 Shakti tracks allocations created by `shaktiMalloc` and records the backend that created each pointer. If code tries to free or copy a known Shakti allocation through a different selected backend, the runtime returns `SHAKTI_ERROR_INVALID_VALUE` before calling into the backend. Plain host pointers that Shakti did not allocate are still accepted as host-side copy operands.
+
+Runtime calls also update a thread-local diagnostic string. `shaktiGetErrorString` gives a stable generic message for a `ShaktiResult`; `shaktiGetLastErrorMessage` explains the most recent runtime failure in more context, such as an unknown selected backend, an unavailable backend status message, or a pointer owned by another backend.
 
 The first launch abstraction is `shaktiLaunchKernel`. On the CPU backend, it synchronously invokes a host function with user args and a `ShaktiLaunchContext` containing grid dimensions, block dimensions, and shared-memory byte count. Mock GPU, CUDA, and HIP currently return `SHAKTI_ERROR_UNAVAILABLE` for launch.
 

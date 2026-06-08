@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v1.3 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA and HIP memory support, allocation ownership checks, CUDA/HIP availability diagnostics, and a minimal CPU launch abstraction.
+Experimental. v1.4 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA and HIP memory support, allocation ownership checks, last-error diagnostics, CUDA/HIP availability diagnostics, and a minimal CPU launch abstraction.
 
 ## Goals
 
@@ -90,12 +90,15 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiGetBackendInfo`
 - `shaktiGetSelectedBackendInfo`
 - `shaktiGetErrorString`
+- `shaktiGetLastErrorMessage`
 
-For v1.3, successful memory behavior is implemented by the CPU and mock GPU
+For v1.4, successful memory behavior is implemented by the CPU and mock GPU
 backends, by CUDA when built with `SHAKTI_ENABLE_CUDA=ON`, and by HIP when built
 with `SHAKTI_ENABLE_HIP=ON`.
 Shakti tracks allocations internally and rejects freeing or copying known Shakti
 allocations through the wrong selected backend.
+`shaktiGetLastErrorMessage` returns a thread-local detail string for the most
+recent Shakti runtime operation.
 `shaktiLaunchKernel` runs a host function synchronously on the CPU backend and is
 a launch-shape placeholder for future GPU work. Backend info APIs report whether
 each backend supports memory, launch, streams, and events.
