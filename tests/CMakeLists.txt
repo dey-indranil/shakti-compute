@@ -20,6 +20,17 @@ target_link_libraries(backend_selection_smoke
 
 add_test(NAME backend_selection_smoke COMMAND backend_selection_smoke)
 
+add_executable(allocation_ownership_smoke
+  allocation_ownership_smoke.cpp
+)
+
+target_link_libraries(allocation_ownership_smoke
+  PRIVATE
+    shakti_runtime
+)
+
+add_test(NAME allocation_ownership_smoke COMMAND allocation_ownership_smoke)
+
 add_executable(cuda_memory_smoke
   cuda_memory_smoke.cpp
 )

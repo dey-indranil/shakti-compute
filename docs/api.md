@@ -93,7 +93,13 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v1.2, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls, and HIP-enabled builds route copies through HIP Runtime API calls. This keeps examples backend-shaped while real GPU support grows one layer at a time.
+In v1.3, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls, and HIP-enabled builds route copies through HIP Runtime API calls. This keeps examples backend-shaped while real GPU support grows one layer at a time.
+
+Shakti also tracks which backend created each allocation. If a known Shakti
+allocation is copied or freed through a different selected backend,
+`SHAKTI_ERROR_INVALID_VALUE` is returned before the backend sees the pointer.
+Plain host pointers that were not created by Shakti remain valid as host-side
+copy operands.
 
 ## Backend Selection
 
@@ -167,7 +173,7 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v1.2:
+In v1.3:
 
 - CPU is available and supports memory and launch.
 - Mock GPU is available and supports memory, but not launch.
@@ -329,6 +335,26 @@ SHAKTI_BACKEND=hip ./build-hip/tests/hip_memory_smoke
 The smoke test prints `PASS` if the HIP backend is known but unavailable, and it
 also prints `PASS` if HIP memory allocation and copies work on a usable HIP
 device. That makes it suitable for both ordinary CI and manual hardware checks.
+
+### 8. Avoid Cross-Backend Pointer Mixups
+
+```cpp
+setenv("SHAKTI_BACKEND", "mock_gpu", 1);
+void* ptr = nullptr;
+shaktiMalloc(&ptr, 1024);
+
+setenv("SHAKTI_BACKEND", "cpu", 1);
+ShaktiResult result = shaktiFree(ptr);
+if (result == SHAKTI_ERROR_INVALID_VALUE) {
+  std::cerr << "That pointer belongs to another Shakti backend\n";
+}
+
+setenv("SHAKTI_BACKEND", "mock_gpu", 1);
+shaktiFree(ptr);
+```
+
+This is useful even before real GPU kernel launch exists because it catches
+backend-selection mistakes early.
 
 The mock GPU backend uses host memory internally, but it is selected through the
 same backend registry as real backends. This lets the project test memory

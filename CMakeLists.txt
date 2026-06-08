@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
   ShaktiCompute
-  VERSION 1.2.0
+  VERSION 1.3.0
   DESCRIPTION "Experimental vendor-neutral accelerated computing runtime"
   LANGUAGES CXX
 )
@@ -25,6 +25,7 @@ endif()
 enable_testing()
 
 add_library(shakti_runtime
+  runtime/common/allocation_registry.cpp
   runtime/common/backend_registry.cpp
   runtime/common/host_memory_backend.cpp
   runtime/common/runtime_common.cpp

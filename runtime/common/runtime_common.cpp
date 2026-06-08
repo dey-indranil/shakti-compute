@@ -1,7 +1,10 @@
 #include "shakti/runtime.h"
 
+#include "common/allocation_registry.h"
 #include "common/backend.h"
 #include "common/backend_registry.h"
+
+#include <cstring>
 
 namespace {
 
@@ -27,6 +30,34 @@ ShaktiResult ensureUsableBackend(shakti::Backend* backend) {
   return SHAKTI_SUCCESS;
 }
 
+ShaktiResult ensureAllocationOwnedBy(const void* ptr,
+                                     const shakti::Backend& backend) {
+  const char* owner = shakti::allocationOwner(const_cast<void*>(ptr));
+  if (owner == nullptr) {
+    return SHAKTI_SUCCESS;
+  }
+
+  if (std::strcmp(owner, backend.name()) != 0) {
+    return SHAKTI_ERROR_INVALID_VALUE;
+  }
+
+  return SHAKTI_SUCCESS;
+}
+
+ShaktiResult ensureMemcpyOwnership(void* dst, const void* src, size_t bytes,
+                                   const shakti::Backend& backend) {
+  if (bytes == 0) {
+    return SHAKTI_SUCCESS;
+  }
+
+  ShaktiResult dst_status = ensureAllocationOwnedBy(dst, backend);
+  if (dst_status != SHAKTI_SUCCESS) {
+    return dst_status;
+  }
+
+  return ensureAllocationOwnedBy(src, backend);
+}
+
 }  // namespace
 
 extern "C" {
@@ -41,7 +72,18 @@ ShaktiResult shaktiMalloc(void** ptr, size_t bytes) {
     return backend_status;
   }
 
-  return backend->malloc(ptr, bytes);
+  ShaktiResult result = backend->malloc(ptr, bytes);
+  if (result != SHAKTI_SUCCESS || ptr == nullptr || *ptr == nullptr) {
+    return result;
+  }
+
+  if (!shakti::registerAllocation(*ptr, backend->name())) {
+    backend->free(*ptr);
+    *ptr = nullptr;
+    return SHAKTI_ERROR_OUT_OF_MEMORY;
+  }
+
+  return SHAKTI_SUCCESS;
 }
 
 ShaktiResult shaktiFree(void* ptr) {
@@ -51,7 +93,17 @@ ShaktiResult shaktiFree(void* ptr) {
     return backend_status;
   }
 
-  return backend->free(ptr);
+  ShaktiResult owner_status = ensureAllocationOwnedBy(ptr, *backend);
+  if (owner_status != SHAKTI_SUCCESS) {
+    return owner_status;
+  }
+
+  ShaktiResult result = backend->free(ptr);
+  if (result == SHAKTI_SUCCESS) {
+    shakti::unregisterAllocation(ptr);
+  }
+
+  return result;
 }
 
 ShaktiResult shaktiMemcpy(void* dst, const void* src, size_t bytes, ShaktiMemcpyKind kind) {
@@ -59,6 +111,11 @@ ShaktiResult shaktiMemcpy(void* dst, const void* src, size_t bytes, ShaktiMemcpy
   ShaktiResult backend_status = ensureUsableBackend(backend);
   if (backend_status != SHAKTI_SUCCESS) {
     return backend_status;
+  }
+
+  ShaktiResult owner_status = ensureMemcpyOwnership(dst, src, bytes, *backend);
+  if (owner_status != SHAKTI_SUCCESS) {
+    return owner_status;
   }
 
   return backend->memcpy(dst, src, bytes, kind);

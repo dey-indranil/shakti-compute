@@ -83,6 +83,12 @@
 - Reject obvious cross-backend frees and copies with clearer errors
 - Keep CPU/mock/CUDA/HIP memory behavior covered by smoke tests
 
+## v1.4: Backend Error Diagnostics
+
+- Add a last-error or detailed diagnostic API
+- Preserve backend-specific failure messages after runtime calls
+- Improve user-facing explanations for unavailable GPU backends
+
 ## Later
 
 - Real GPU kernels

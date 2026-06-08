@@ -455,3 +455,38 @@ Deferred:
 Recommended next milestone:
 
 - v1.3 should add memory ownership diagnostics so allocations know which backend created them and obvious cross-backend misuse produces clearer errors.
+
+## v1.3: Memory Ownership Diagnostics
+
+Status: implemented locally
+
+Achieved:
+
+- Added a private allocation registry for pointers returned by `shaktiMalloc`.
+- Recorded the backend name that created each nonzero allocation.
+- Made `shaktiMalloc` unregister-safe by freeing successful allocations if registry bookkeeping fails.
+- Made `shaktiFree` reject known allocations owned by a different selected backend.
+- Made `shaktiMemcpy` reject known source or destination allocations owned by a different selected backend.
+- Preserved plain host pointer behavior for stack/vector buffers used as host-side copy operands.
+- Added `allocation_ownership_smoke` for rejected cross-backend frees and copies.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke`
+
+Deferred:
+
+- Public pointer-owner query API.
+- Detailed last-error messages naming the expected and selected backends.
+- Byte-size tracking for allocation bounds checks.
+- Cross-backend transfer APIs.
+
+Recommended next milestone:
+
+- v1.4 should add backend error diagnostics, such as a last-error or detailed diagnostic API, so users can see richer backend-specific failure reasons.
