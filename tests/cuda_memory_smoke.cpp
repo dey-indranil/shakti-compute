@@ -27,13 +27,20 @@ int main() {
     return 1;
   }
 
+  bool ok = true;
+  ok = ok && expect(info.status_message != nullptr,
+                    "CUDA backend should provide a status message");
+
   if (!info.available) {
-    std::cout << "PASS\n";
+    ok = ok && expect(info.supports_memory == 0,
+                      "unavailable CUDA backend should not report memory support");
+    ok = ok && expect(shaktiIsBackendAvailable("cuda") == 0,
+                      "unavailable CUDA backend should report unavailable");
+    std::cout << (ok ? "PASS" : "FAIL") << "\n";
     unsetenv("SHAKTI_BACKEND");
-    return 0;
+    return ok ? 0 : 1;
   }
 
-  bool ok = true;
   int source[4] = {10, 20, 30, 40};
   int destination[4] = {0, 0, 0, 0};
   void* device_ptr = nullptr;

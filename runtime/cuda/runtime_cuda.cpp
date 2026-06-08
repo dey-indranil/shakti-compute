@@ -7,6 +7,24 @@
 namespace {
 
 #if SHAKTI_HAS_CUDA_RUNTIME
+const char* cudaStatusMessage() {
+  int device_count = 0;
+  cudaError_t result = cudaGetDeviceCount(&device_count);
+  switch (result) {
+    case cudaSuccess:
+      if (device_count > 0) {
+        return "CUDA backend has runtime memory support";
+      }
+      return "CUDA runtime found no CUDA devices";
+    case cudaErrorNoDevice:
+      return "CUDA runtime found no CUDA devices";
+    case cudaErrorInsufficientDriver:
+      return "CUDA driver is missing or insufficient for the CUDA runtime";
+    default:
+      return cudaGetErrorString(result);
+  }
+}
+
 ShaktiResult mapCudaResult(cudaError_t result) {
   switch (result) {
     case cudaSuccess:
@@ -54,6 +72,10 @@ bool hasCudaDevice() {
   int device_count = 0;
   return cudaGetDeviceCount(&device_count) == cudaSuccess && device_count > 0;
 }
+#else
+const char* cudaStatusMessage() {
+  return "CUDA backend was not built; configure with SHAKTI_ENABLE_CUDA=ON";
+}
 #endif
 
 class CudaBackend final : public shakti::Backend {
@@ -91,11 +113,7 @@ class CudaBackend final : public shakti::Backend {
   }
 
   const char* statusMessage() const override {
-#if SHAKTI_HAS_CUDA_RUNTIME
-    return "CUDA backend has runtime memory support";
-#else
-    return "CUDA backend is a skeleton";
-#endif
+    return cudaStatusMessage();
   }
 
   ShaktiResult malloc(void** ptr, size_t bytes) override {

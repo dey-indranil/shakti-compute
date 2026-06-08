@@ -93,7 +93,7 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v1.0, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls. This keeps examples backend-shaped while real CUDA memory support grows.
+In v1.1, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls. This keeps examples backend-shaped while real CUDA memory support grows.
 
 ## Backend Selection
 
@@ -167,7 +167,7 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v1.0:
+In v1.1:
 
 - CPU is available and supports memory and launch.
 - Mock GPU is available and supports memory, but not launch.
@@ -334,7 +334,8 @@ This optional smoke test allocates CUDA memory, copies host data to the device,
 copies it back, synchronizes, and frees the allocation. It passes without CUDA in
 the default build by confirming that CUDA is known but unavailable. In a
 CUDA-enabled build, the CUDA backend reports available only when a usable CUDA
-device and driver are present.
+device and driver are present. If CUDA is unavailable, inspect
+`ShaktiBackendInfo.status_message` for the reason.
 
 ## What Shakti Does Not Do Yet
 

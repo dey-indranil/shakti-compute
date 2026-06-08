@@ -1,6 +1,6 @@
 # Programming Model
 
-Shakti Compute v1.0 exposes a small C runtime API inspired by familiar accelerator runtimes.
+Shakti Compute v1.1 exposes a small C runtime API inspired by familiar accelerator runtimes.
 
 The always-available memory backends are CPU and mock GPU. Both use ordinary host memory, and `shaktiMemcpy` performs checked byte copies for every `ShaktiMemcpyKind`. CUDA can also provide real device memory operations when Shakti is configured with `SHAKTI_ENABLE_CUDA=ON` and the CUDA Toolkit is available.
 

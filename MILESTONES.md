@@ -380,3 +380,38 @@ Deferred:
 Recommended next milestone:
 
 - v1.1 should add optional HIP memory support or improve CUDA diagnostics depending on available contributor hardware.
+
+## v1.1: CUDA Diagnostics
+
+Status: implemented locally
+
+Achieved:
+
+- Improved CUDA backend status messages:
+  - CUDA not built into Shakti
+  - CUDA runtime found no devices
+  - CUDA driver missing or insufficient
+  - CUDA runtime error string for other device-count failures
+- Kept CUDA availability tied to a usable CUDA device and driver.
+- Extended `cuda_memory_smoke` to validate CUDA status messages and capability consistency in unavailable builds.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke`
+
+Deferred:
+
+- CUDA kernel launch.
+- CUDA streams and events.
+- Per-call last-error details.
+- HIP memory operations.
+
+Recommended next milestone:
+
+- v1.2 should add optional HIP memory support behind `SHAKTI_ENABLE_HIP`, using the CUDA memory seed as the pattern.

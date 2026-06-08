@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v1.0 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA memory support, a HIP backend skeleton, and a minimal CPU launch abstraction.
+Experimental. v1.1 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA memory support with clearer diagnostics, a HIP backend skeleton, and a minimal CPU launch abstraction.
 
 ## Goals
 
