@@ -30,3 +30,14 @@ target_link_libraries(cuda_memory_smoke
 )
 
 add_test(NAME cuda_memory_smoke COMMAND cuda_memory_smoke)
+
+add_executable(hip_memory_smoke
+  hip_memory_smoke.cpp
+)
+
+target_link_libraries(hip_memory_smoke
+  PRIVATE
+    shakti_runtime
+)
+
+add_test(NAME hip_memory_smoke COMMAND hip_memory_smoke)

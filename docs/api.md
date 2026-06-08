@@ -2,7 +2,7 @@
 
 This guide explains the public Shakti Compute C API for people who are new to the project.
 
-Shakti Compute is an experimental runtime for writing accelerator-style code against one small API. Today, the CPU backend is the only backend that actually runs work. CUDA and HIP are present as named skeleton backends so the project can grow toward multiple hardware targets without changing the public shape every milestone.
+Shakti Compute is an experimental runtime for writing accelerator-style code against one small API. Today, the CPU backend is the only backend that runs kernel-shaped work. CPU and mock GPU memory work everywhere; CUDA and HIP memory can work in optional builds when the matching runtime and hardware are present.
 
 Use the umbrella header:
 
@@ -18,7 +18,7 @@ Think of Shakti Compute as three pieces:
 - A backend API for asking which backend is selected and what it can do.
 - A launch API for running a small kernel-shaped host function on the CPU backend.
 
-For now, Shakti memory is ordinary host memory. `shaktiLaunchKernel` is synchronous on CPU. There are no streams, events, async copies, or real GPU kernels yet.
+For CPU and mock GPU, Shakti memory is ordinary host memory. CUDA and HIP builds can use real device memory for allocation and copy calls. `shaktiLaunchKernel` is synchronous on CPU. There are no streams, events, async copies, or real GPU kernels yet.
 
 ## Results And Errors
 
@@ -93,7 +93,7 @@ SHAKTI_MEMCPY_DEVICE_TO_HOST
 SHAKTI_MEMCPY_DEVICE_TO_DEVICE
 ```
 
-In v1.1, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls. This keeps examples backend-shaped while real CUDA memory support grows.
+In v1.2, CPU and mock GPU treat all valid memcpy kinds as checked byte copies. CUDA-enabled builds route copies through CUDA Runtime API calls, and HIP-enabled builds route copies through HIP Runtime API calls. This keeps examples backend-shaped while real GPU support grows one layer at a time.
 
 ## Backend Selection
 
@@ -113,7 +113,7 @@ Current behavior:
 - `cpu`: selects CPU
 - `mock_gpu`: selects a hardware-free backend for dispatch and memory tests
 - `cuda`: selects CUDA; unavailable by default, memory-capable when built with `SHAKTI_ENABLE_CUDA=ON`
-- `hip`: selects HIP skeleton, currently unavailable
+- `hip`: selects HIP; unavailable by default, memory-capable when built with `SHAKTI_ENABLE_HIP=ON`
 - anything else: unknown backend
 
 Get the selected backend name:
@@ -167,12 +167,12 @@ if (shaktiGetSelectedBackendInfo(&selected) == SHAKTI_SUCCESS) {
 }
 ```
 
-In v1.1:
+In v1.2:
 
 - CPU is available and supports memory and launch.
 - Mock GPU is available and supports memory, but not launch.
 - CUDA is known and supports memory only when built with `SHAKTI_ENABLE_CUDA=ON`.
-- HIP is known but unavailable.
+- HIP is known and supports memory only when built with `SHAKTI_ENABLE_HIP=ON`.
 - No backend supports streams or events yet.
 
 ## Launch API
@@ -226,7 +226,7 @@ Rules:
 - Every grid and block dimension must be nonzero.
 - `args` may be null if your kernel function can handle it.
 - CPU launch is synchronous.
-- CUDA and HIP skeletons return `SHAKTI_ERROR_UNAVAILABLE`.
+- CUDA and HIP return `SHAKTI_ERROR_UNAVAILABLE` for launch.
 
 ## Mini Cookbook
 
@@ -310,13 +310,25 @@ if (result == SHAKTI_ERROR_UNAVAILABLE) {
 }
 ```
 
-This is what happens today with `SHAKTI_BACKEND=cuda` or `SHAKTI_BACKEND=hip`.
+This is what happens with `SHAKTI_BACKEND=cuda` or `SHAKTI_BACKEND=hip` when the backend was not built in, the vendor runtime is missing, or no compatible device is available.
 
 ### 6. Test Non-CPU Dispatch Without Hardware
 
 ```sh
 SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke
 ```
+
+### 7. Try HIP Memory On A HIP Machine
+
+```sh
+cmake -S . -B build-hip -DSHAKTI_ENABLE_HIP=ON
+cmake --build build-hip
+SHAKTI_BACKEND=hip ./build-hip/tests/hip_memory_smoke
+```
+
+The smoke test prints `PASS` if the HIP backend is known but unavailable, and it
+also prints `PASS` if HIP memory allocation and copies work on a usable HIP
+device. That makes it suitable for both ordinary CI and manual hardware checks.
 
 The mock GPU backend uses host memory internally, but it is selected through the
 same backend registry as real backends. This lets the project test memory

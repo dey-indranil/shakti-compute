@@ -63,9 +63,10 @@ int main() {
   ok = ok && expect(shaktiGetBackendInfo(3, &info) == SHAKTI_SUCCESS,
                     "HIP backend info is available");
   ok = ok && expect(std::strcmp(info.name, "hip") == 0, "backend 3 is HIP");
-  ok = ok && expect(info.available == 0, "HIP backend info reports unavailable");
-  ok = ok && expect(info.supports_memory == 0, "HIP skeleton does not support memory");
-  ok = ok && expect(info.supports_launch == 0, "HIP skeleton does not support launch");
+  const int hip_available = info.available;
+  ok = ok && expect(info.supports_memory == hip_available,
+                    "HIP memory support matches availability");
+  ok = ok && expect(info.supports_launch == 0, "HIP launch remains unavailable");
   ok = ok && expect(info.status_message != nullptr, "HIP backend has status message");
 
   ok = ok && expect(shaktiGetBackendInfo(4, &info) == SHAKTI_ERROR_INVALID_VALUE,
@@ -92,8 +93,8 @@ int main() {
                     "mock GPU backend is available");
   ok = ok && expect(shaktiIsBackendAvailable("cuda") == cuda_available,
                     "CUDA availability matches backend info");
-  ok = ok && expect(shaktiIsBackendAvailable("hip") == 0,
-                    "HIP backend skeleton is unavailable by default");
+  ok = ok && expect(shaktiIsBackendAvailable("hip") == hip_available,
+                    "HIP availability matches backend info");
   ok = ok && expect(shaktiIsBackendAvailable("bogus") == 0,
                     "unknown backend is unavailable");
 
@@ -158,12 +159,20 @@ int main() {
                     "selected HIP backend info is available");
   ok = ok && expect(std::strcmp(info.name, "hip") == 0,
                     "selected backend info reports HIP");
-  ok = ok && expect(shaktiMalloc(&ptr, 16) == SHAKTI_ERROR_UNAVAILABLE,
-                    "HIP skeleton returns unavailable");
+  ShaktiResult hip_malloc_result = shaktiMalloc(&ptr, 16);
+  if (hip_available) {
+    ok = ok && expect(hip_malloc_result == SHAKTI_SUCCESS,
+                      "HIP backend allocates memory when available");
+    ok = ok && expect(shaktiFree(ptr) == SHAKTI_SUCCESS,
+                      "HIP backend frees memory when available");
+  } else {
+    ok = ok && expect(hip_malloc_result == SHAKTI_ERROR_UNAVAILABLE,
+                      "HIP backend returns unavailable when not available");
+    ok = ok && expect(ptr == nullptr, "HIP backend clears allocation output");
+  }
   ok = ok && expect(shaktiLaunchKernel(emptyKernel, grid, block, nullptr, 0) ==
                         SHAKTI_ERROR_UNAVAILABLE,
-                    "HIP skeleton launch returns unavailable");
-  ok = ok && expect(ptr == nullptr, "HIP skeleton clears allocation output");
+                    "HIP launch remains unavailable");
 
   setenv("SHAKTI_BACKEND", "bogus", 1);
   ptr = reinterpret_cast<void*>(0x1);

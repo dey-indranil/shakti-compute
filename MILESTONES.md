@@ -415,3 +415,43 @@ Deferred:
 Recommended next milestone:
 
 - v1.2 should add optional HIP memory support behind `SHAKTI_ENABLE_HIP`, using the CUDA memory seed as the pattern.
+
+## v1.2: HIP Memory Seed
+
+Status: implemented locally
+
+Achieved:
+
+- Added optional HIP package discovery when `SHAKTI_ENABLE_HIP=ON`.
+- Linked a known HIP host runtime CMake target for HIP-enabled builds.
+- Implemented HIP backend memory operations behind the HIP flag:
+  - `shaktiMalloc`
+  - `shaktiFree`
+  - `shaktiMemcpy`
+  - `shaktiDeviceSynchronize`
+- Mapped common HIP runtime errors to `ShaktiResult`.
+- Added HIP status messages for not-built, no-device, and runtime error states.
+- Kept HIP launch unavailable.
+- Added `hip_memory_smoke`, which passes in default builds and exercises HIP memory when HIP is enabled.
+- Updated backend selection tests so HIP capabilities adapt to build/runtime availability.
+- Updated README, programming model, API guide, roadmap, and project version.
+
+Verified:
+
+- `cmake -S . -B build`
+- `cmake --build build`
+- `ctest --test-dir build --output-on-failure`
+- `./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy`
+- `SHAKTI_BACKEND=mock_gpu ./build/tests/backend_selection_smoke`
+
+Deferred:
+
+- HIP kernel launch.
+- HIP streams and events.
+- HIP allocator metadata.
+- Cross-backend allocation ownership checks.
+
+Recommended next milestone:
+
+- v1.3 should add memory ownership diagnostics so allocations know which backend created them and obvious cross-backend misuse produces clearer errors.

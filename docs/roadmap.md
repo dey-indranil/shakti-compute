@@ -77,6 +77,12 @@
 - HIP malloc/free/memcpy/sync
 - Manual HIP smoke test
 
+## v1.3: Memory Ownership Diagnostics
+
+- Track which backend created each Shakti allocation
+- Reject obvious cross-backend frees and copies with clearer errors
+- Keep CPU/mock/CUDA/HIP memory behavior covered by smoke tests
+
 ## Later
 
 - Real GPU kernels

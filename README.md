@@ -6,7 +6,7 @@ The goal is to provide a CUDA-familiar programming model that can eventually tar
 
 ## Current Status
 
-Experimental. v1.1 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA memory support with clearer diagnostics, a HIP backend skeleton, and a minimal CPU launch abstraction.
+Experimental. v1.2 has CPU and mock GPU backends, backend selection, backend capability queries, CI, optional CUDA and HIP memory support, CUDA/HIP availability diagnostics, and a minimal CPU launch abstraction.
 
 ## Goals
 
@@ -32,8 +32,8 @@ cmake -S . -B build
 cmake --build build
 ```
 
-CUDA memory support is optional and requires the CUDA Toolkit. HIP remains an
-unavailable skeleton. Configure optional backends with:
+CUDA memory support is optional and requires the CUDA Toolkit. HIP memory support
+is optional and requires ROCm/HIP. Configure optional backends with:
 
 ```sh
 cmake -S . -B build -DSHAKTI_ENABLE_CUDA=ON
@@ -41,7 +41,8 @@ cmake -S . -B build -DSHAKTI_ENABLE_HIP=ON
 ```
 
 CUDA-enabled builds still require a usable CUDA device and driver before the
-CUDA backend reports itself as available.
+CUDA backend reports itself as available. HIP-enabled builds likewise require a
+usable HIP device and runtime before the HIP backend reports itself as available.
 
 ## Test
 
@@ -66,10 +67,11 @@ explicitly:
 SHAKTI_BACKEND=cpu ./build/examples/saxpy/saxpy
 ```
 
-`SHAKTI_BACKEND=cuda` and `SHAKTI_BACKEND=hip` are recognized backend names, but
+`SHAKTI_BACKEND=cuda` and `SHAKTI_BACKEND=hip` are recognized backend names.
 CUDA only performs memory operations when Shakti is built with
-`SHAKTI_ENABLE_CUDA=ON`; HIP currently returns `SHAKTI_ERROR_UNAVAILABLE` for
-runtime operations.
+`SHAKTI_ENABLE_CUDA=ON`; HIP only performs memory operations when Shakti is built
+with `SHAKTI_ENABLE_HIP=ON`. Both backends still return
+`SHAKTI_ERROR_UNAVAILABLE` for kernel launch.
 `SHAKTI_BACKEND=mock_gpu` is available for hardware-free backend dispatch and
 memory testing.
 
@@ -89,9 +91,9 @@ The initial C API lives in `include/shakti/runtime.h` and provides:
 - `shaktiGetSelectedBackendInfo`
 - `shaktiGetErrorString`
 
-For v1.0, successful memory behavior is implemented by the CPU and mock GPU
-backends, and by CUDA when built with `SHAKTI_ENABLE_CUDA=ON`.
-HIP exists as an explicit skeleton backend only.
+For v1.2, successful memory behavior is implemented by the CPU and mock GPU
+backends, by CUDA when built with `SHAKTI_ENABLE_CUDA=ON`, and by HIP when built
+with `SHAKTI_ENABLE_HIP=ON`.
 `shaktiLaunchKernel` runs a host function synchronously on the CPU backend and is
 a launch-shape placeholder for future GPU work. Backend info APIs report whether
 each backend supports memory, launch, streams, and events.
